@@ -1,18 +1,25 @@
 import assert from "assert";
 import { QueryParameter } from "./queryParameter";
 
-/// Optional parameters for query exection.
+/*
+ * Optional parameters for query exection.
+ */
 export interface ExecutionParams {
   query_parameters?: QueryParameter[];
   performance?: QueryEngine;
 }
 
-/// Choice of execution engine when executing query via API [default = medium]
+/*
+ * Choice of execution engine when executing query via API [default = medium]
+ */
 export enum QueryEngine {
   Medium = "medium",
   Large = "large",
 }
 
+/*
+ *  Payload sent when uploading a CSV file to Dune.
+ */
 export type UploadCSVArgs = {
   table_name: string;
   data: string;
@@ -20,7 +27,9 @@ export type UploadCSVArgs = {
   is_private?: boolean;
 };
 
-/// Payload sent upon requests to Dune API.
+/*
+ *  Payload sent upon requests to Dune API.
+ */
 export type RequestPayload =
   | GetResultParams
   | ExecuteQueryParams
@@ -31,7 +40,9 @@ export type RequestPayload =
   | InsertTableArgs
   | Buffer;
 
-/// Utility method used by router to parse request payloads.
+/*
+ * Utility method used by router to parse request payloads.
+ */
 export function payloadJSON(payload?: RequestPayload): string {
   return JSON.stringify(payloadRecords(payload));
 }
@@ -101,31 +112,43 @@ interface BaseParams {
 }
 
 export interface GetResultParams extends BaseParams {
-  /// Limit number of rows to return.
-  /// This together with 'offset' allows easy pagination through results in an incremental and efficient way.
-  /// This parameter is incompatible with sampling (`sample_count`).
+  /*
+   * Limit number of rows to return.
+   * This together with 'offset' allows easy pagination through results in an incremental and efficient way.
+   * This parameter is incompatible with sampling (`sample_count`).
+   */
   limit?: number;
-  /// Offset row number to start (inclusive, first row means offset=0) returning results from.
-  /// This together with 'limit' allows easy pagination through results.
-  /// This parameter is incompatible with sampling (`sample_count`).
+  /*
+   * Offset row number to start (inclusive, first row means offset=0) returning results from.
+   * This together with 'limit' allows easy pagination through results.
+   * This parameter is incompatible with sampling (`sample_count`).
+   */
   offset?: number;
-  /// Number of rows to return from the result by sampling the data.
-  /// This is useful when you want to get a uniform sample instead of the entire result.
-  /// If the result has less than the sample count, the entire result is returned.
-  /// Note that this will return a randomized sample, so not every call will return the same result.
-  /// This parameter is incompatible with `offset`, `limit`, and `filters` parameters.
+  /*
+   * Number of rows to return from the result by sampling the data.
+   * This is useful when you want to get a uniform sample instead of the entire result.
+   * If the result has less than the sample count, the entire result is returned.
+   * Note that this will return a randomized sample, so not every call will return the same result.
+   * This parameter is incompatible with `offset`, `limit`, and `filters` parameters.
+   */
   sample_count?: number;
-  /// Expression to filter out rows from the results to return.
-  /// This expression is similar to a SQL WHERE clause.
-  /// More details about it in the [Filtering](https://docs.dune.com/api-reference/executions/filtering) section of the doc.
-  /// This parameter is incompatible with `sample_count`.
+  /*
+   * Expression to filter out rows from the results to return.
+   * This expression is similar to a SQL WHERE clause.
+   * More details about it in the [Filtering](https://docs.dune.com/api-reference/executions/filtering) section of the doc.
+   * This parameter is incompatible with `sample_count`.
+   */
   filters?: string;
-  /// Expression to define the order in which the results should be returned.
-  /// This expression is similar to a SQL ORDER BY clause.
-  /// More details about it in the [Sorting](https://docs.dune.com/api-reference/executions/sorting) section of the doc.
+  /*
+   * Expression to define the order in which the results should be returned.
+   * This expression is similar to a SQL ORDER BY clause.
+   * More details about it in the [Sorting](https://docs.dune.com/api-reference/executions/sorting) section of the doc.
+   */
   sort_by?: string[] | string;
-  /// Specified columns to be returned. If omitted, all columns are included.
-  /// Tip: use this to limit the result to specific columns, reducing datapoints cost of the call.
+  /*
+   * Specified columns to be returned. If omitted, all columns are included.
+   * Tip: use this to limit the result to specific columns, reducing datapoints cost of the call.
+   */
   columns?: string[] | string;
 }
 
@@ -197,29 +220,40 @@ export function validateAndBuildGetResultParams({
 }
 
 export interface ExecuteQueryParams extends BaseParams {
-  /// The performance engine tier the execution will be run on.
-  /// Can be either medium or large.
-  /// Medium consumes 10 credits, and large consumes 20 credits, per run.
-  /// Default is medium.
+  /* The performance engine tier the execution will be run on.
+   * Can be either medium or large.
+   * Medium consumes 10 credits, and large consumes 20 credits, per run.
+   * Default is medium.
+   */
   performance: QueryEngine;
 }
 
 export interface BaseCRUDParams extends BaseParams {
-  /// Description of the query.
+  /**
+   * Description of the query.
+   */
   description?: string;
-  /// Name of the query.
+  /**
+   * Name of the query.
+   */
   name?: string;
-  /// The SQL query text.
+  /**
+   * The SQL query text.
+   */
   query_sql: string;
 }
 
-/// Payload sent with query update requests.
+/**
+ * Payload sent with query update requests.
+ */
 export interface UpdateQueryParams extends BaseCRUDParams {
   /// Tags to be added (overrides existing tags).
   tags?: string[];
 }
 
-/// Payload sent with query creation requests.
+/*
+ * Payload sent with query creation requests.
+ */
 export interface CreateQueryParams extends BaseCRUDParams {
   /// Indicates if the query is private.
   is_private?: boolean;
@@ -234,34 +268,52 @@ export enum ColumnType {
 }
 
 export interface SchemaRecord {
-  /// The column name. Can contain letters, numbers, and underscores,
-  /// but must begin with a letter or an underscore.
+  /*
+   * The column name. Can contain letters, numbers, and underscores,
+   * but must begin with a letter or an underscore.
+   */
   name: string;
-  /// The column type.
+  /*
+   * The column type.
+   */
   type: ColumnType;
 }
 
 export interface DeleteTableArgs {
-  /// The namespace of the table to delete (e.g. my_user).
+  /*
+   * The namespace of the table to delete (e.g. my_user).
+   */
   namespace: string;
-  /// The name of the table to delete (e.g. interest_rates).
+  /*
+   * The name of the table to delete (e.g. interest_rates).
+   */
   table_name: string;
 }
 
 export interface CreateTableArgs {
-  /// A description of the table.
+  /*
+   * A description of the table.
+   */
   description?: string;
-  /// If true, the table will be private.
-  /// If private it is only visible to the team or user that your API key is associated with.
+  /*
+   * If true, the table will be private.
+   * If private it is only visible to the team or user that your API key is associated with.
+   */
   is_private?: boolean;
-  /// The namespace of the table to create.
-  /// Must be the name of your associated API key, i.e. either `my_user` or `my_team`.
+  /*
+   * The namespace of the table to create.
+   * Must be the name of your associated API key, i.e. either `my_user` or `my_team`.
+   */
   namespace: string;
-  /// An ordered list of columns that define the table schema. Cannot be empty.
+  /*
+   * An ordered list of columns that define the table schema. Cannot be empty.
+   */
   schema: SchemaRecord[];
-  /// The name of the table to create.
-  /// Must begin with a lowercase letter and contain only lowercase letters,
-  /// digits, and underscores.
+  /*
+   * The name of the table to create.
+   * Must begin with a lowercase letter and contain only lowercase letters,
+   * digits, and underscores.
+   */
   table_name: string;
 }
 
@@ -275,46 +327,72 @@ export enum ContentType {
 }
 
 export interface InsertTableArgs {
-  /// The namespace of the table to insert into (e.g. `my_user`).
+  /*
+   * The namespace of the table to insert into (e.g. `my_user`).
+   */
   namespace: string;
-  /// The name of the table to insert into (e.g. `interest_rates`).
+  /*
+   * The name of the table to insert into (e.g. `interest_rates`).
+   */
   table_name: string;
-  /// The body is of type file.
+  /*
+   * The body is of type file.
+   */
   data: Buffer;
   content_type: ContentType;
 }
 
 export interface Options {
-  /// The page size when retriving results.
+  /*
+   * The page size when retriving results.
+   */
   batchSize?: number;
-  /// How frequently should we check execution status
+  /*
+   * How frequently should we check execution status
+   */
   pingFrequency?: number;
-  /// Determines result expiry date.
+  /*
+   * Determines result expiry date.
+   */
   maxAgeHours?: number;
 }
 
 export interface RunQueryArgs extends GetResultParams, ExecutionParams {
-  /// ID of the query.
+  /*
+   * ID of the query.
+   */
   queryId: number;
   opts?: Options;
 }
 
 export interface LatestResultArgs {
-  /// ID of the query.
+  /*
+   * ID of the query.
+   */
   queryId: number;
   parameters?: QueryParameter[];
   opts?: Options;
 }
 
 export interface RunSqlArgs extends ExecutionParams {
-  /// raw sql of query to run (Trino/DuneSQL syntax)
+  /*
+   * raw sql of query to run (Trino/DuneSQL syntax)
+   */
   query_sql: string;
-  /// Name of created query.
+  /*
+   * Name of created query.
+   */
   name?: string;
-  /// Whether the created query should be private or not (default = true).
+  /*
+   * Whether the created query should be private or not (default = true).
+   */
   isPrivate?: boolean;
-  /// Whether the created query should be archived immediately after execution or not (default = true).
+  /*
+   * Whether the created query should be archived immediately after execution or not (default = true).
+   */
   archiveAfter?: boolean;
-  /// Additional options execution options.
+  /*
+   * Additional options execution options.
+   */
   opts?: Options;
 }

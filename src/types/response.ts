@@ -1,4 +1,6 @@
-/// Various possible states of a query exeuction.
+/*
+ * Various possible states of a query exeuction.
+ */
 export enum ExecutionState {
   COMPLETED = "QUERY_STATE_COMPLETED",
   EXECUTING = "QUERY_STATE_EXECUTING",
@@ -35,13 +37,17 @@ export function concatResultCSV(
   };
 }
 
-/// Response resturned from query execution request.
+/*
+ * Response resturned from query execution request.
+ */
 export interface ExecutionResponse {
   execution_id: string;
   state: ExecutionState;
 }
 
-/// Response resturned from query creation request.
+/*
+ * Response resturned from query creation request.
+ */
 export interface CreateQueryResponse {
   query_id: number;
 }
@@ -50,91 +56,157 @@ export type SuccessResponse = {
   success: boolean;
 };
 
-/// Various query times related to an query status request.
+/*
+ * Various query times related to an query status request.
+ */
 export interface TimeData {
   submitted_at: Date;
-  /// Timestamp of when the query execution started.
+  /*
+   * Timestamp of when the query execution started.
+   */
   execution_started_at?: Date;
-  /// Timestamp of when the query execution ended.
+  /*
+   * Timestamp of when the query execution ended.
+   */
   execution_ended_at?: Date;
-  /// Timestamp of when the query result expires.
+  /*
+   * Timestamp of when the query result expires.
+   */
   expires_at?: Date;
-  /// Timestamp of when the query execution was cancelled, if applicable.
+  /*
+   * Timestamp of when the query execution was cancelled, if applicable.
+   */
   cancelled_at?: Date;
 }
 
-/// Metadata contained within a quer `ExecutionResult`
+/*
+ * Metadata contained within a quer `ExecutionResult`
+ */
 export interface ResultMetadata {
-  /// Names of the columns contained in the query results.
+  /*
+   * Names of the columns contained in the query results.
+   */
   column_names: string[];
-  /// Total number of data points in result.
-  /// Used as part of the API credits computation.
+  /*
+   * Total number of data points in result.
+   * Used as part of the API credits computation.
+   */
   datapoint_count: number;
-  /// Time in milliseconds that the query took to execute.
+  /*
+   * Time in milliseconds that the query took to execute.
+   */
   execution_time_millis: number;
-  /// How long they query was pending (in the queue) before execution began.
+  /*
+   * How long they query was pending (in the queue) before execution began.
+   */
   pending_time_millis: number;
-  // Number of bytes in the result set for the current page of results.
+  /*
+   * Number of bytes in the result set for the current page of results.
+   */
   result_set_bytes: number;
-  // Number of rows in the result set for the current page of results.
+  /*
+   * Number of rows in the result set for the current page of results.
+   */
   row_count: number;
-  // Total number of bytes in the result set. This doesn't include the json representation overhead.
+  /*
+   * Total number of bytes in the result set. This doesn't include the json representation overhead.
+   */
   total_result_set_bytes: number;
-  // Total number of rows in the result set.
+  /*
+   * Total number of rows in the result set.
+   */
   total_row_count: number;
 }
 
-/// Status resonse fields contained in both Incomplete and Complete ExecutionStatus Responses.
+/*
+ * Status resonse fields contained in both Incomplete and Complete ExecutionStatus Responses.
+ */
 interface BaseStatusResponse extends TimeData {
-  // Unique identifier for the execution of the query.
+  /*
+   * Unique identifier for the execution of the query.
+   */
   execution_id: string;
-  // Unique identifier of the query.
+  /*
+   * Unique identifier of the query.
+   */
   query_id: number;
   queue_position?: number;
 }
 
-/// Format of a `GetStatusResponse` when the query execution is anything but complete.
+/*
+ * Format of a `GetStatusResponse` when the query execution is anything but complete.
+ */
 interface IncompleteStatusResponse extends BaseStatusResponse {
-  // The state of the query execution.
+  /*
+   * The state of the query execution.
+   */
   state: Exclude<ExecutionState, ExecutionState.COMPLETED>;
 }
 
-/// Format of `GetStatusResponse` when a query execution has completed.
+/*
+ * Format of `GetStatusResponse` when a query execution has completed.
+ */
 interface CompleteStatusResponse extends BaseStatusResponse {
-  // The state of the query execution.
+  /*
+   *  The state of the query execution.
+   */
   state: ExecutionState.COMPLETED;
-  // Metadata about the execution of the query, including details like column names,
-  // row counts, and execution times.
+  /*
+   * Metadata about the execution of the query, including details like column names,
+   * row counts, and execution times.
+   */
   result_metadata: ResultMetadata;
 }
 
 export type GetStatusResponse = IncompleteStatusResponse | CompleteStatusResponse;
 
-/// Result of a Query Execution.
+/*
+ * Result of a Query Execution.
+ */
 export interface ExecutionResult {
-  // A list of rows. A row is dictionary of key-value pairs returned by the query,
-  // each pair corresponding to a column
+  /*
+   * A list of rows. A row is dictionary of key-value pairs returned by the query,
+   * each pair corresponding to a column
+   */
   rows: Record<string, unknown>[];
-  // Metadata about the execution of the query, including details like column names,
-  // row counts, and execution times.
+  /*
+   * Metadata about the execution of the query, including details like column names,
+   * row counts, and execution times.
+   */
   metadata: ResultMetadata;
 }
 
-/// Response of reqeust for results of a query execution.
+/*
+ * Response of reqeust for results of a query execution.
+ */
 export interface ResultsResponse extends TimeData {
-  // Unique identifier for the execution of the query.
+  /*
+   * Unique identifier for the execution of the query.
+   */
   execution_id: string;
-  // Unique identifier of the query.
+  /*
+   * Unique identifier of the query.
+   */
   query_id: number;
-  // Whether the state of the query execution is terminal. This can be used for polling purposes.
+  /*
+   * Whether the state of the query execution is terminal. This can be used for polling purposes.
+   */
   is_execution_finished: boolean;
-  // Offset that can be used to retrieve the next page of results.
+  /*
+   * Offset that can be used to retrieve the next page of results.
+   */
   next_offset: number;
-  // URI that can be used to fetch the next page of results.
+  /*
+   * URI that can be used to fetch the next page of results.
+   */
   next_uri: string;
-  // The state of the query execution.
+  /*
+   * The state of the query execution.
+   */
   state: ExecutionState;
-  // only present when state is COMPLETE
+  /*
+   * only present when state is COMPLETE
+   */
   result?: ExecutionResult;
 }
 
@@ -190,18 +262,28 @@ function concatResultMetadata(
 }
 
 export interface DeleteTableResult {
-  /// The confirmation message of the deleted table
+  /*
+   * The confirmation message of the deleted table
+   */
   message: string;
 }
 
 export interface CreateTableResult {
-  /// An example query to use on Dune querying your new table.
+  /*
+   * An example query to use on Dune querying your new table.
+   */
   example_query: string;
-  /// The full name of the created table, as it should be referred to in a query.
+  /*
+   * The full name of the created table, as it should be referred to in a query.
+   */
   full_name: string;
-  /// The namespace of the created table.
+  /*
+   * The namespace of the created table.
+   */
   namespace: string;
-  /// The name of the created table.
+  /*
+   * The name of the created table.
+   */
   table_name: string;
 }
 

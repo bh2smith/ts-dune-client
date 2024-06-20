@@ -1,4 +1,6 @@
-/// All supported Dune Query Parameter types.
+/*
+ * All supported Dune Query Parameter types.
+ */
 export enum ParameterType {
   /// Note that text fields may also be used for varbinary data types.
   TEXT = "text",
@@ -7,7 +9,9 @@ export enum ParameterType {
   ENUM = "enum",
 }
 
-/// Class representing Dune Query Parameters with convience constructor methods for each type.
+/*
+ * Class representing Dune Query Parameters with convience constructor methods for each type.
+ */
 export class QueryParameter {
   type: ParameterType;
   value: string;

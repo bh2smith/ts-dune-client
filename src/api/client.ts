@@ -47,6 +47,12 @@ export class DuneClient {
   /// Custom Endpoint Interface
   custom: CustomAPI;
 
+  /**
+   * Constructor for the DuneClient.
+   *
+   * @param {string} apiKey
+   * @returns Execution Results
+   */
   constructor(apiKey: string) {
     this.exec = new ExecutionAPI(apiKey);
     this.query = new QueryAPI(apiKey);
